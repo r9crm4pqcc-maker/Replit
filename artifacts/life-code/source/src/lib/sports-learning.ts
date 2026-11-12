@@ -4,7 +4,7 @@
 import history from "@/lib/sports-history.json";
 
 /** Bump this when the learned code changes. The old study is dropped. Past and future both use the new code. */
-export const LEARNED_CODE = "2026-11-09-elo";
+export const LEARNED_CODE = "2026-11-12-adaptive-layers";
 
 const KEY = "shem-sports-learning-v1";
 
@@ -68,8 +68,17 @@ export function accuracy(): { picks: number; hits: number; pct: number } {
 export function resetLearning() { write({ records: [], bias: {} }); }
 
 const LOG_KEY = "shem-sports-steplog-v1";
+export const LEARNING_UPDATED_EVENT = "shem-sports-learning-updated";
 export interface StepVote { side: "home" | "away"; layer: string; weight: number }
 export interface StepLogEntry { id: string; date: string; home: string; away: string; pick: "home" | "away"; confidence?: number; margin?: number; noBet?: boolean; votes: StepVote[]; actual?: "home" | "away" | "draw" }
+export type GameOutcome = "home" | "away" | "draw";
+
+export function outcomeFromScore(homeScore: number, awayScore: number): GameOutcome | null {
+  if (!Number.isFinite(homeScore) || !Number.isFinite(awayScore)) return null;
+  if (homeScore === awayScore) return "draw";
+  return homeScore > awayScore ? "home" : "away";
+}
+
 function readLog(): StepLogEntry[] {
   if (typeof window === "undefined") return [];
   try { return JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); } catch { return []; }
@@ -88,6 +97,7 @@ export function scoreStepPick(id: string, actual: "home" | "away" | "draw") {
     if (actual !== "draw") {
       learnLayers(ex.votes, actual);
       noteStudyGame(id, ex.votes, actual, ex.pick);
+      window.dispatchEvent(new Event(LEARNING_UPDATED_EVENT));
     }
   }
 }
@@ -142,7 +152,7 @@ export function runOriginal<T>(fn: () => T): T {
   try { return fn(); } finally { forceOriginal--; }
 }
 
-const STUDY_KEY = "shem-sports-study-v1";
+const STUDY_KEY = `shem-sports-study-${LEARNED_CODE}-v1`;
 export interface StudyLayer { hits: number; total: number }
 export interface StudyState {
   y: number; m: number; d: number;

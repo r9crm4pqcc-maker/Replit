@@ -4,7 +4,7 @@ import { ChevronDown, ChevronUp, RefreshCw, Loader2, AlertCircle, Calendar } fro
 import { fetchESPNGames, fetchFanDuelBoard, fetchOuts, getLeagueInfo, fetchFighterDob, type ESPNGame, type OddsBlock } from "@/lib/espn";
 import { getTeamMeta } from "@/lib/sports-data";
 import { fetchAutoMatchup, type AutoMatchup } from "@/lib/espn-auto";
-import { layerWeights, logStepPick, savedHistory, scoreStepPick, setSportsMode, sportsMode, stepHitRates, type SportsMode } from "@/lib/sports-learning";
+import { layerWeights, logStepPick, savedHistory, scoreStepPick, setSportsMode, sportsMode, stepHitRates, outcomeFromScore, LEARNING_UPDATED_EVENT, type SportsMode } from "@/lib/sports-learning";
 import { calcAthletePersonalDay } from "@/lib/numerology";
 import { runVotes, TEAM_COLORS, fmt, colorNumsLabel, confidenceBand, type VoteResult } from "@/lib/vote-decode";
 import { FullDecode, computeFullDecode, parseDob, type DecodeEntity } from "@/components/FullDecode";
@@ -242,7 +242,7 @@ function bestLegs(legs: { pct: number; allow: number | null; open: boolean }[]) 
   return (hot.length >= 2 ? hot : open).slice(0, 4);
 }
 
-function GameCard({ game, year, month, day, idx, league, learned, onReady, prices, outs }: { game: ESPNGame; year: number; month: number; day: number; idx: number; league: string; learned: boolean; onReady?: (row: BoardRow) => void; prices: Record<string, OddsBlock>; outs: Record<string, string[]> }) {
+function GameCard({ game, year, month, day, idx, league, learned, learningRevision, onReady, prices, outs }: { game: ESPNGame; year: number; month: number; day: number; idx: number; league: string; learned: boolean; learningRevision: number; onReady?: (row: BoardRow) => void; prices: Record<string, OddsBlock>; outs: Record<string, string[]> }) {
   const [auto, setAuto] = useState<AutoMatchup | null>(null);
   const [autoLoading, setAutoLoading] = useState(true);
   const [openDecode, setOpenDecode] = useState(false);
@@ -297,7 +297,7 @@ function GameCard({ game, year, month, day, idx, league, learned, onReady, price
       stadiumOpened: homeMeta?.stadiumOpened, cityFounded: homeMeta?.cityFounded,
       stadium: homeMeta?.stadium, city: homeMeta?.city,
     });
-  }, [game.id, year, month, day, auto, league, dobs, kickoff]);
+  }, [game.id, year, month, day, auto, league, dobs, kickoff, learned, game.status === "post" ? 0 : learningRevision]);
   const ov = useOverrides();
   const full = useMemo(() => {
     const tri = (t?: readonly number[]) => (t ? [t[0], t[1], t[2]] as Tri : undefined);
@@ -368,6 +368,7 @@ function GameCard({ game, year, month, day, idx, league, learned, onReady, price
   const allow = gapHit(v.votes, finalPick);
   const verdict = `PICK ${pickName}. ${game.awayTeam} ${awayPct}% · ${game.homeTeam} ${homePct}%.`;
   const isFinal = game.status === "post";
+  const outcome = isFinal ? outcomeFromScore(Number(game.homeScore), Number(game.awayScore)) : null;
   const logId = `${year}-${month}-${day}|${game.id}`;
   const venueName = game.venue ?? homeMeta?.stadium ?? "Venue";
   const when = kickLabel(game.startTime);
@@ -376,10 +377,10 @@ function GameCard({ game, year, month, day, idx, league, learned, onReady, price
     if (autoLoading) return;
     logStepPick({ id: logId, date: `${year}-${month}-${day}`, home: game.homeTeam, away: game.awayTeam, pick: finalPick, confidence: v.confidence, margin: stackGap, votes: v.votes.map(x => ({ side: x.side, layer: x.layer, weight: x.weight })) });
     if (isFinal) {
-      const h = Number(game.homeScore), a = Number(game.awayScore);
-      scoreStepPick(logId, h > a ? "home" : a > h ? "away" : "draw");
+      const finalOutcome = outcomeFromScore(Number(game.homeScore), Number(game.awayScore));
+      if (finalOutcome) scoreStepPick(logId, finalOutcome);
     }
-  }, [autoLoading, isFinal, logId, v]);
+  }, [autoLoading, isFinal, logId, v, game.homeScore, game.awayScore]);
 
   useEffect(() => {
     onReady?.({
@@ -396,7 +397,7 @@ function GameCard({ game, year, month, day, idx, league, learned, onReady, price
   }, [game.id, pickName, pickPct, allow, game.status, venueName, when]);
 
   const result = isFinal ? `${game.awayAbbr} ${game.awayScore} – ${game.homeScore} ${game.homeAbbr}` : null;
-  const hit = isFinal ? ((Number(game.homeScore) > Number(game.awayScore) ? "home" : "away") === finalPick) : null;
+  const hit = outcome && outcome !== "draw" ? outcome === finalPick : null;
   const qualified = isBest(pickPct, allow);
   const fd = fanDuelFor(prices, game.awayTeam, game.homeTeam);
   const book = fd?.moneylineHome || fd?.moneylineAway ? fd : (game.odds.moneylineHome || game.odds.moneylineAway ? game.odds : null);
@@ -429,7 +430,7 @@ function GameCard({ game, year, month, day, idx, league, learned, onReady, price
           <div className="text-right">
             <p className="text-[9px] uppercase tracking-[0.16em] text-white/35">Pick</p>
             <p className="text-[13px] font-black" style={{ color: YELLOW }}>{pickName}</p>
-            {result ? <p className="text-[10px] mt-1" style={{ color: hit ? YELLOW : ROSE }}>{result} · {hit ? "HIT" : "MISS"}</p> : <StatusBadge status={game.status} detail={game.statusDetail} />}
+            {result ? <p className="text-[10px] mt-1" style={{ color: hit === null ? "rgba(255,255,255,0.55)" : hit ? YELLOW : ROSE }}>{result} · {outcome === "draw" ? "PUSH" : hit === null ? "RESULT UNAVAILABLE" : hit ? "HIT" : "MISS"}</p> : <StatusBadge status={game.status} detail={game.statusDetail} />}
           </div>
         </div>
         {(book || awayOut.length || homeOut.length || starter) && (
@@ -579,6 +580,7 @@ function AthletePersonalDayCard({ month, day, year }: { month: number; day: numb
 
 export default function SportsPredictionPage() {
   const [mounted, setMounted] = useState(false);
+  const [learningRevision, setLearningRevision] = useState(0);
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth() + 1);
   const [day, setDay] = useState(today.getDate());
@@ -597,6 +599,11 @@ export default function SportsPredictionPage() {
   const [prices, setPrices] = useState<Record<string, OddsBlock>>({});
   const [outs, setOuts] = useState<Record<string, string[]>>({});
   useEffect(() => { setMounted(true); setCode(sportsMode()); }, []);
+  useEffect(() => {
+    const refreshLearnedPicks = () => setLearningRevision((revision) => revision + 1);
+    window.addEventListener(LEARNING_UPDATED_EVENT, refreshLearnedPicks);
+    return () => window.removeEventListener(LEARNING_UPDATED_EVENT, refreshLearnedPicks);
+  }, []);
   useEffect(() => { setBoard({}); }, [league, month, day, year, code]);
   useEffect(() => {
     let alive = true;
@@ -654,7 +661,7 @@ export default function SportsPredictionPage() {
       by[lg] = list.map((g) => slateLeg(g, year, month, day, lg, ov, code === "learned"));
     }
     return by;
-  }, [allGames, year, month, day, code, ov]);
+  }, [allGames, year, month, day, code, ov, learningRevision]);
   const sportParlays = LEAGUE_GROUPS.flatMap((g) => g.leagues).map((lg) => ({ lg, legs: bestLegs(books[lg] ?? []) })).filter((x) => x.legs.length > 0);
   const dayReport = (() => {
     const legs = Object.values(books).flat();
@@ -813,7 +820,7 @@ export default function SportsPredictionPage() {
         <div className="rounded-2xl p-8 text-center"><AlertCircle size={20} className="mx-auto mb-2" style={{ color: ROSE }} /><p className="text-sm text-white">{error}</p></div>
       ) : (
         <div className="space-y-3">
-          {games.map((g, i) => <GameCard key={`${code}-${g.id}`} game={g} year={year} month={month} day={day} idx={i} league={league} learned={code === "learned"} onReady={onReady} prices={prices} outs={outs} />)}
+          {games.map((g, i) => <GameCard key={`${code}-${g.id}`} game={g} year={year} month={month} day={day} idx={i} league={league} learned={code === "learned"} learningRevision={learningRevision} onReady={onReady} prices={prices} outs={outs} />)}
         </div>
       ))}
 

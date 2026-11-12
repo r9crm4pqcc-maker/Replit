@@ -8,7 +8,7 @@ import { getTeamMeta } from "./sports-data";
 
 /** Route ESPN calls through our same-origin proxy (ESPN sends no CORS headers). */
 export function espnFetch(url: string): Promise<Response> {
-  return fetch(`/api/public/espn?url=${encodeURIComponent(url)}`);
+  return fetch(`/sports-data/espn?url=${encodeURIComponent(url)}`);
 }
 
 // Chinese zodiac allies (San He triangles) and clashes (Liu Chong opposites)

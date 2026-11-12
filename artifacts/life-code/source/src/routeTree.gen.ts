@@ -50,8 +50,8 @@ import { Route as GematriaSplatRouteImport } from './routes/gematria.$'
 import { Route as MatrixCalendarSplatRouteImport } from './routes/matrix-calendar.$'
 import { Route as NumerologySplatRouteImport } from './routes/numerology.$'
 import { Route as SoccerAiSplatRouteImport } from './routes/soccer-ai.$'
+import { Route as SportsDataEspnRouteImport } from './routes/sports-data.espn'
 import { Route as TarotSplatRouteImport } from './routes/tarot.$'
-import { Route as ApiPublicEspnRouteImport } from './routes/api/public/espn'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -258,15 +258,15 @@ const SoccerAiSplatRoute = SoccerAiSplatRouteImport.update({
   path: '/$',
   getParentRoute: () => SoccerAiRoute,
 } as any)
+const SportsDataEspnRoute = SportsDataEspnRouteImport.update({
+  id: '/sports-data/espn',
+  path: '/sports-data/espn',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TarotSplatRoute = TarotSplatRouteImport.update({
   id: '/$',
   path: '/$',
   getParentRoute: () => TarotRoute,
-} as any)
-const ApiPublicEspnRoute = ApiPublicEspnRouteImport.update({
-  id: '/api/public/espn',
-  path: '/api/public/espn',
-  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -311,8 +311,8 @@ export interface FileRoutesByFullPath {
   '/matrix-calendar/$': typeof MatrixCalendarSplatRoute
   '/numerology/$': typeof NumerologySplatRoute
   '/soccer-ai/$': typeof SoccerAiSplatRoute
+  '/sports-data/espn': typeof SportsDataEspnRoute
   '/tarot/$': typeof TarotSplatRoute
-  '/api/public/espn': typeof ApiPublicEspnRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -356,8 +356,8 @@ export interface FileRoutesByTo {
   '/matrix-calendar/$': typeof MatrixCalendarSplatRoute
   '/numerology/$': typeof NumerologySplatRoute
   '/soccer-ai/$': typeof SoccerAiSplatRoute
+  '/sports-data/espn': typeof SportsDataEspnRoute
   '/tarot/$': typeof TarotSplatRoute
-  '/api/public/espn': typeof ApiPublicEspnRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -402,8 +402,8 @@ export interface FileRoutesById {
   '/matrix-calendar/$': typeof MatrixCalendarSplatRoute
   '/numerology/$': typeof NumerologySplatRoute
   '/soccer-ai/$': typeof SoccerAiSplatRoute
+  '/sports-data/espn': typeof SportsDataEspnRoute
   '/tarot/$': typeof TarotSplatRoute
-  '/api/public/espn': typeof ApiPublicEspnRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -449,8 +449,8 @@ export interface FileRouteTypes {
     | '/matrix-calendar/$'
     | '/numerology/$'
     | '/soccer-ai/$'
+    | '/sports-data/espn'
     | '/tarot/$'
-    | '/api/public/espn'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -494,8 +494,8 @@ export interface FileRouteTypes {
     | '/matrix-calendar/$'
     | '/numerology/$'
     | '/soccer-ai/$'
+    | '/sports-data/espn'
     | '/tarot/$'
-    | '/api/public/espn'
   id:
     | '__root__'
     | '/'
@@ -539,8 +539,8 @@ export interface FileRouteTypes {
     | '/matrix-calendar/$'
     | '/numerology/$'
     | '/soccer-ai/$'
+    | '/sports-data/espn'
     | '/tarot/$'
-    | '/api/public/espn'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -572,7 +572,7 @@ export interface RootRouteChildren {
   TradingAiRoute: typeof TradingAiRoute
   VedicRoute: typeof VedicRoute
   DaySplatRoute: typeof DaySplatRoute
-  ApiPublicEspnRoute: typeof ApiPublicEspnRoute
+  SportsDataEspnRoute: typeof SportsDataEspnRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -864,19 +864,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SoccerAiSplatRouteImport
       parentRoute: typeof SoccerAiRoute
     }
+    '/sports-data/espn': {
+      id: '/sports-data/espn'
+      path: '/sports-data/espn'
+      fullPath: '/sports-data/espn'
+      preLoaderRoute: typeof SportsDataEspnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tarot/$': {
       id: '/tarot/$'
       path: '/$'
       fullPath: '/tarot/$'
       preLoaderRoute: typeof TarotSplatRouteImport
       parentRoute: typeof TarotRoute
-    }
-    '/api/public/espn': {
-      id: '/api/public/espn'
-      path: '/api/public/espn'
-      fullPath: '/api/public/espn'
-      preLoaderRoute: typeof ApiPublicEspnRouteImport
-      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -1069,7 +1069,7 @@ const rootRouteChildren: RootRouteChildren = {
   TradingAiRoute: TradingAiRoute,
   VedicRoute: VedicRoute,
   DaySplatRoute: DaySplatRoute,
-  ApiPublicEspnRoute: ApiPublicEspnRoute,
+  SportsDataEspnRoute: SportsDataEspnRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
