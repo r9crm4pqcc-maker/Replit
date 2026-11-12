@@ -146,6 +146,13 @@ describe("confidence system", () => {
     expect(r.reads.home.sign).toBe("Rat");
     expect(r.steps.length).toBe(7);
   });
+  it("UFC individual bouts do not get home-field or venue-side tiebreaks", () => {
+    const fighter = { name: "Fighter", founded: [1990, 1, 1] as [number, number, number], record: "10-5", people: [] };
+    const r = runVotes({ year: 2026, month: 10, day: 10, league: "UFC", individual: true, home: fighter, away: { ...fighter } });
+    expect(r.votes.some((v) => v.reason === "Home field")).toBe(false);
+    expect(r.votes.some((v) => v.reason === "Tiebreaker: home field")).toBe(false);
+    expect(r.votes.some((v) => v.reason === "Tiebreaker: neutral fighter ordering")).toBe(true);
+  });
 });
 
 import { luckyNumber as _ln } from "./vote-decode";

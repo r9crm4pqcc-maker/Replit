@@ -8,7 +8,7 @@ import { moonPhase } from "./sports-decode";
 import { healingood } from "./healingood";
 import { PROFILE } from "./profile";
 import { colorsForDay } from "./colorology";
-import { layerMultiplier, learningActive } from "./sports-learning";
+import { layerMultiplier, layerWeights, learningActive } from "./sports-learning";
 import { ruleId } from "./sports-rules";
 import ruleTable from "./sports-rules.json";
 import ratings from "./team-ratings.json";
@@ -401,6 +401,7 @@ export function computeConfidence(o: { winner: number; loser: number; noPlay: bo
 const RATING_HOME: Record<string, number> = { MLB: 28, NFL: 48, NHL: 35, NBA: 50 };
 const RATING_B2B: Record<string, number> = { MLB: 0, NFL: 0, NHL: 50, NBA: 40 };
 function teamRatingVote(inp: VoteInput, add: (side: Side, weight: number, layer: Step, reason: string) => void) {
+  if (inp.individual) return false;
   const league = inp.league ?? "";
   const table = (ratings as Record<string, Record<string, { elo: number; last: string }>>)[league];
   const home = table?.[inp.home.name];
@@ -621,8 +622,8 @@ export function runVotes(inp: VoteInput): VoteResult {
   const moonDay = Date.UTC(inp.year, inp.month - 1, inp.day) / 86400000;
   const moonCycle = (((moonDay - moonRef) % 29.53059) + 29.53059) % 29.53059;
   const moonIllum = Math.round((1 - Math.cos((2 * Math.PI * moonCycle) / 29.53059)) / 2 * 100);
-  if (moon === "New Moon") add("away", 0.25, "Stars & venue", "New moon (secondary) — starting energy backs the road attacker");
-  if (moon === "Full Moon") add("home", 0.25, "Stars & venue", "Full moon (secondary) — finishing energy backs the home side");
+  if (!inp.individual && moon === "New Moon") add("away", 0.25, "Stars & venue", "New moon (secondary) — starting energy backs the road attacker");
+  if (!inp.individual && moon === "Full Moon") add("home", 0.25, "Stars & venue", "Full moon (secondary) — finishing energy backs the home side");
   if (hc && ac && hc !== ac) {
     const favorite: Side = hc > ac ? "home" : "away";
     const dog: Side = favorite === "home" ? "away" : "home";
@@ -846,7 +847,7 @@ export function runVotes(inp: VoteInput): VoteResult {
         add(s, 1, "Records", `Better record gap ${band} — ${better.name} ${better.record} over ${worse.name} ${worse.record}`);
       }
     }
-    add("home", rated ? 0 : 1, "Records", "Home field");
+    if (!inp.individual) add("home", rated ? 0 : 1, "Records", "Home field");
     const bandOf = (gap: number) => gap >= 0.5 ? 50 : gap >= 0.4 ? 40 : gap >= 0.3 ? 30 : gap >= 0.15 ? 15 : 0;
     const leanLine = (homeRec: string | undefined, awayRec: string | undefined, min: number, label: string, weights: Record<number, number>) => {
       const hpct = winPct(homeRec), apct = winPct(awayRec);
@@ -879,14 +880,17 @@ export function runVotes(inp: VoteInput): VoteResult {
   }
   const specific = ruleTable as Record<string, { total?: number; weight?: number }>;
   const useRules = learningActive() && Object.keys(specific).length > 0;
+  const adaptiveWeights = learningActive() ? layerWeights() : {};
   for (const v of votes) {
     if (!useRules) {
       const m = layerMultiplier(v.layer);
       if (m !== 1) v.weight = Math.round(v.weight * m * 100) / 100;
-      continue;
+    } else {
+      const row = specific[ruleId(v.reason)];
+      if (row && (row.total ?? 0) >= 100) v.weight = Math.round(v.weight * (row.weight ?? 0) * 100) / 100;
     }
-    const row = specific[ruleId(v.reason)];
-    if (row && (row.total ?? 0) >= 100) v.weight = Math.round(v.weight * (row.weight ?? 0) * 100) / 100;
+    const learnedMultiplier = adaptiveWeights[v.layer] ?? 1;
+    if (learnedMultiplier !== 1) v.weight = Math.round(v.weight * learnedMultiplier * 100) / 100;
   }
   const ratingVote = votes.find(v => ruleId(v.reason) === "team-rating");
   const favName = ratingVote ? (ratingVote.side === "home" ? inp.home.name : inp.away.name) : "";
@@ -906,14 +910,26 @@ export function runVotes(inp: VoteInput): VoteResult {
   }
   home = total("home"); away = total("away");
   let tiebreak = false;
+  let tiePick: Side | null = null;
   if (home === away) {
     tiebreak = true;
     const h = winPct(inp.home.record), a = winPct(inp.away.record);
-    const s: Side = h != null && a != null && a > h ? "away" : "home";
-    add(s, 0.1, "Records", h != null && a != null && h !== a ? `Tiebreaker: better record (${s === "home" ? inp.home.record : inp.away.record})` : "Tiebreaker: home field");
+    const hasRecordEdge = h != null && a != null && h !== a;
+    const s: Side = hasRecordEdge
+      ? (h > a ? "home" : "away")
+      : inp.individual
+        ? (inp.home.name.localeCompare(inp.away.name, undefined, { sensitivity: "base" }) <= 0 ? "home" : "away")
+        : "home";
+    tiePick = s;
+    const reason = hasRecordEdge
+      ? `Tiebreaker: better record (${s === "home" ? inp.home.record : inp.away.record})`
+      : inp.individual
+        ? "Tiebreaker: neutral fighter ordering"
+        : "Tiebreaker: home field";
+    add(s, inp.individual && !hasRecordEdge ? 0 : 0.1, "Records", reason);
     home = total("home"); away = total("away");
   } else if (tiedBeforeColor) tiebreak = true;
-  const pick: Side = home >= away ? "home" : "away";
+  const pick: Side = home > away ? "home" : away > home ? "away" : inp.individual && tiePick ? tiePick : "home";
   const noEdge: Record<Step, string> = {
     "Team core": !reads.home.lp || !reads.away.lp ? `${inp.individual ? "Birth" : "Founding"} date missing for one side` : `Equal core signatures (${fmt(reads.home.lp)} vs ${fmt(reads.away.lp)})`,
     "Game-day energy": hh || ah ? `Both sides touch today's ${dayLabel} equally` : `Neither side touches today's ${dayLabel}`,

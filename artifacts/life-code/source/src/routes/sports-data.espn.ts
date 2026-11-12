@@ -8,7 +8,7 @@ const ALLOWED = [
   "sbapi.nj.sportsbook.fanduel.com",
 ];
 
-export const Route = createFileRoute("/api/public/espn")({
+export const Route = createFileRoute("/sports-data/espn")({
   server: {
     handlers: {
       GET: async ({ request }) => {
