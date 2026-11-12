@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Life Code"
+description = "Imported web application from the user's uploaded workspace archive, preserved as supplied."
+version = "1.0.0"
+id = "artifacts/life-code"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19395
+
+[services.development]
+run = "pnpm --filter @workspace/life-code run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/life-code", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/life-code/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19395"
+BASE_PATH = "/"

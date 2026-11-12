@@ -1,0 +1,40 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Life Code",
+      "hasCanvas": false,
+      "bodyTextLen": 1345,
+      "bodyTextHash": "09e0eabd54086c29f5a0f91921e68ae67c4fd6d8a98371868153244b0fa54fb8",
+      "bodyTextPrefix": "LIFE CODE DECODE SUITE Home Your Chart Date Library Reports Goal",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/preview-prod.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Life Code",
+      "hasCanvas": false,
+      "bodyTextLen": 1355,
+      "bodyTextHash": "d2b46298952a926824b513d016334f27aa7a36f01329350188bb5e8acc373ed4",
+      "bodyTextPrefix": "LIFE CODE DECODE SUITE Home Your Chart Date Library Reports Goal",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/preview-prod-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/preview-prod.json",
+  "divergesFromBaseline": true,
+  "baselineReasons": [
+    "desktop: body text changed (826 -> 1345 chars, hash mismatch)"
+  ]
+}

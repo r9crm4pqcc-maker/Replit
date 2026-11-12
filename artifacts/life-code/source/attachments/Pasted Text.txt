@@ -1,0 +1,23 @@
+1. Add Colorology (highest impact add)
+Map team / player / venue colors against the day and personal cycles.
+Core color rules from the system:
+•  Red = 9 energy (endings, vanity, dangerous, siphoning). Bad on 9-days, 9-cycles, or when you want stability.
+•  Black = also dangerous in excess (pairs with red as the two “dangerous” colors).
+•  Blue = communication, calm, preferred.
+•  White = clean, preferred.
+•  Gold / yellow = money / 8-17-26 / 28 energy.
+•  Green = growth / 3 or 8-related in some readings.
+How to score it in a game:
+•  Team primary color vs universal day energy (friendly / neutral / enemy)
+•  Team primary color vs their own personal day cycle
+•  Away team color vs home stadium dominant color
+•  Pitcher jersey number color resonance (if jersey color matches their lucky number or personal day)
+•  Bonus if both teams’ colors are “dangerous” (red/black) on a 9-day → higher volatility / fade or under lean
+Add a simple color score (0–2 points) into your stacking so it can break ties or strengthen a lean.
+2. Accuracy upgrades that actually move the needle
+•  User chart overlay — Flag if the game date is the user’s beneficial, soulmate, fatal, or challenging date. Biggest edge for personal betting.
+•  Wealth day flag — Explicitly mark if the game falls on an 8 / 17 / 26 or pure 8-day. Stronger lean for overs or favorite money lines.
+•  Hour cycle weighting — You already track start → mid → closing. Weight the closing hour higher for late-game / run-line / total decisions.
+•  Master number multiplier — When a team, city, or stadium is on an 11 / 22 / 33 day or has a master life path, increase that side’s weight (you already highlight them — just make it a formal multiplier).
+•  Record vibration — You note 9-vibration records. Make it a formal rule: teams whose current record reduces to 9 get a small penalty on 9-days.
+•  Stadium + city double check — You already do this. Add whether the stadium founding date is a beneficial or challenging date for each team that night.

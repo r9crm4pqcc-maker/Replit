@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Life Code",
+      "hasCanvas": false,
+      "bodyTextLen": 826,
+      "bodyTextHash": "5736f50974e20415e110b9b6301bf32e39e4d0a4ac25bd280d067cda145a1916",
+      "bodyTextPrefix": "LIFE CODE DECODE SUITE Home Your Chart Date Library Reports Goal",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Life Code",
+      "hasCanvas": false,
+      "bodyTextLen": 1355,
+      "bodyTextHash": "d2b46298952a926824b513d016334f27aa7a36f01329350188bb5e8acc373ed4",
+      "bodyTextPrefix": "LIFE CODE DECODE SUITE Home Your Chart Date Library Reports Goal",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

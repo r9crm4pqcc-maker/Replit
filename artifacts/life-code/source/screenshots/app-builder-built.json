@@ -1,0 +1,41 @@
+{
+  "url": "http://127.0.0.1:8081/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Matrix Command Center",
+      "hasCanvas": false,
+      "bodyTextLen": 1845,
+      "bodyTextHash": "855a449e1d334844025709485ca66061146a7c657c33283d4997bfa3ae968fb2",
+      "bodyTextPrefix": "DASHBOARD DECODE SUITE Home Numerology Astrology Tools Sports AI",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Matrix Command Center",
+      "hasCanvas": false,
+      "bodyTextLen": 1855,
+      "bodyTextHash": "e86ed23fc6201ac014332f2b3029b44af7965f4a25af09fc6066a42930d0eed0",
+      "bodyTextPrefix": "DASHBOARD DECODE SUITE Home Numerology Astrology Tools Sports AI",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-built-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-built.json",
+  "divergesFromBaseline": true,
+  "baselineReasons": [
+    "desktop: title changed (\"Matrix Command Center — Matrix Command Center\" -> \"Matrix Command Center\")",
+    "mobile: title changed (\"Matrix Command Center — Matrix Command Center\" -> \"Matrix Command Center\")"
+  ]
+}

@@ -1,0 +1,57 @@
+Core stacking & weighting
+•  Formal point values for every layer (personal day, Chinese animal, city, stadium, master number, color, hour, record vibration)
+•  Master-number multiplier (11 / 22 / 33) as a scored boost
+•  Closing-hour cycle as the heaviest weight for totals and late-game
+•  Stacking weight for “friend → enemy” or “enemy → friend” flips during the game
+•  Minimum stacking threshold before a pick is allowed (e.g. must clear +3)
+Date & cycle overlays
+•  User’s own beneficial / soulmate / fatal / challenging / enemy-month dates flagged on every game
+•  Wealth-day (8 / 17 / 26) and pure 28-day explicit flags
+•  Personal month and personal year of the bettor as a soft modifier
+•  9-day / 9-cycle automatic volatility or under lean
+•  1-day / 17th automatic slight favorite or over lean when stacking is close
+Colorology (full module)
+•  Team primary color vs universal day energy
+•  Team primary color vs their own personal day
+•  Pitcher jersey color vs their lucky number or personal day
+•  Away color vs home stadium dominant color
+•  Red/black penalty on 9-days
+•  Gold/yellow bonus on 8-17-26 or 28 days
+•  Blue/white bonus on 1-days
+•  Color score as 0–2 point tiebreaker
+Chinese animal layer
+•  Full friend / enemy / neutral matrix for team + pitcher + coach + city + stadium
+•  Trine bonuses (already partially present)
+•  Clash penalties
+•  Secret-friend / secret-enemy callouts if the animal pair qualifies
+•  Animal year of the game vs each entity’s animal
+Venue, city & environment
+•  City + stadium double-check as hard filter (both challenging = full point penalty)
+•  Stadium founding date vs each team’s beneficial/challenging list
+•  Lunar cycle percentage as light modifier
+•  Eclipse or special astronomical day flag if it falls on game day
+•  Home/away record vibration (9-vibration penalty on 9-days)
+Player & personnel
+•  Pitcher vs pitcher full comparison (life path, personal day, animal, lucky number)
+•  Coach animal and personal day vs opposing team
+•  Jersey number resonance vs day, lucky number, and life path (scored, not just noted)
+•  Birth-card match between pitcher and opposing team/coach
+•  Key reliever or closer hour-cycle check for late innings
+Records, lines & meta
+•  Current record root (especially 9-vibration) as formal deduction
+•  Season win% root as secondary vibration check
+•  Opening line vs closing line movement as external confirmation (optional outside system)
+•  Volume / public % as secondary filter only
+Output & decision layer
+•  One-line “do / avoid” summary per side
+•  Clear systemic verdict with confidence % and exact point total
+•  Volatility flag when red/black + 9-day or hour-cycle flip is present
+•  “No bet” rule when stacking is under threshold or both sides have equal master numbers
+•  Historical hit-rate tracker by stacking strength (so you can see which score ranges actually win)
+Advanced / optional
+•  User’s personal hour vs game time window (enemy-hour avoidance)
+•  Full natal / rising overlay if birth time is known
+•  Power-color recommendation for the bettor that day
+•  28 / 33 manifestation day note if the game falls on one
+•  Secondary energy and day-of-year root deeper scoring
+•  Week-of-year root as extra light layer
