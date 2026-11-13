@@ -17,7 +17,7 @@ function lines(e: DecodeEntity, r: CycleRead | null): string[] {
   if (e.kind === "team" || e.kind === "stadium") out.push(`Lunar Cycle: ${r.moon.label}`);
   out.push(`Personal Year Cycle: ${show(r.py)}`, `Personal Month Cycle: ${show(r.pm)}`, `Personal Day Cycle: ${show(r.pd)}`, `Personal Week Cycle: ${show(r.pw)}`,
     `Personal Hour Cycle: ${r.ph[0]} at start → ${r.ph[1]} mid-game → ${r.ph[2]} closing (closing weighted highest)`,
-    `Chinese Zodiac Year: ${r.yearP}`, `Chinese Zodiac Month: ${r.monthP}`, `Chinese Zodiac Day: ${r.dayP}`,
+    `Chinese Zodiac Year: ${r.yearP}`, `Chinese Zodiac Month: ${r.monthP}`,
     `Lucky Number: ${r.lucky} (root ${r.luckyRoot})`);
   if (e.kind === "player") out.push(`Jersey Number: ${e.jersey ?? "not in feed"}${e.jersey && +e.jersey === r.lucky ? " — matches Lucky Number" : ""}`);
   if (e.kind === "team") { const rr = recordRoot(e.record); out.push(`Current Record: ${e.record ?? "not in feed"}${rr ? ` (${rr} vibration)` : ""}`); }
@@ -47,7 +47,7 @@ export function FullDecode({ title, data, homeName, awayName, verdict }: { title
   const { ge, reads } = data;
   const gameLines = [`Lifepath: ${show(ge.lp)}`, `Secondary Energy: ${show(ge.secondary)}`, `Day Of The Year: ${ge.doy} (root ${ge.doyRoot})`,
     `Week Of The Year: ${ge.woy} (root ${ge.woyRoot})`, `Lunar Cycle: ${ge.moon.label}`, `Chinese Zodiac Year: ${ge.yearP}`,
-    `Chinese Zodiac Month: ${ge.monthP}`, `Chinese Zodiac Day: ${ge.dayP}`, `Chinese Zodiac Hour: ${ge.hourP[0]} → ${ge.hourP[1]}`];
+    `Chinese Zodiac Month: ${ge.monthP}`, `Chinese Zodiac Hour: ${ge.hourP[0]} → ${ge.hourP[1]}`];
   const group = (k: DecodeEntity["kind"]) => reads.filter(x => x.e.kind === k);
   const sections: [string, typeof reads][] = [["PART 2 · THE TEAMS", group("team")], ["PART 3 · KEY PLAYERS", group("player")], ["PART 4 · THE CITY", group("city")], ["PART 5 · THE STADIUM", group("stadium")]];
   const head = (x: (typeof reads)[number]) => `${(x.e as { edited?: boolean }).edited ? "✎ " : ""}${x.e.side === "away" ? "AWAY · " : x.e.side === "home" ? "HOME · " : ""}${x.e.name}${x.e.role ? ` (${x.e.role})` : ""}`;

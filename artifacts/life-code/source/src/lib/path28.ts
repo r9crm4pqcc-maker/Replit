@@ -1,7 +1,7 @@
 /** Life path 28/1. 28 stays 28. It is the wealth compound, not a plain 1. */
 
 import { calcUniversalDay, calcUniversalMonth } from "@/lib/numerology";
-import { chineseDaySign, chineseMonthSign, chineseSign, lifePath } from "@/lib/vote-decode";
+import { chineseMonthSign, chineseSign, lifePath } from "@/lib/vote-decode";
 import { sunSign } from "@/lib/life-studio";
 import { compat } from "@/lib/gg33";
 import { numberRelation, secretRelation, signRelation, type Sign } from "@/lib/vote-decode";
@@ -296,12 +296,10 @@ export function birthPair(a: { year: number; month: number; day: number }, b: { 
     lp,
     animal,
     sky,
-    dayAnimal: animalPct(chineseDaySign(a.year, a.month, a.day), chineseDaySign(b.year, b.month, b.day)),
     num,
     a: `${la.compound}/${la.reduced}`,
     b: `${lb.compound}/${lb.reduced}`,
     animals: `${animalNameA} and ${animalNameB}`,
-    days: `${chineseDaySign(a.year, a.month, a.day)} and ${chineseDaySign(b.year, b.month, b.day)}`,
     suns: `${sunA} and ${sunB}`,
     fatal: num.rel === "enemy" || animal <= 10 || sky <= 10,
   };
@@ -329,7 +327,6 @@ export function dayCompatibility(input: {
   combinedCompound: number;
   yearAnimal: string;
   monthAnimal: string;
-  dayAnimal: string;
   sun: string;
   daySun: string;
 }) {
@@ -346,7 +343,6 @@ export function dayCompatibility(input: {
     numbers,
     numberPct,
     month: animalPct(input.yearAnimal, input.monthAnimal),
-    day: animalPct(input.yearAnimal, input.dayAnimal),
     sky: sunPct(input.sun, input.daySun),
   };
 }
@@ -559,17 +555,15 @@ export function cueMatchPercent(founded: readonly number[] | undefined, y: numbe
     combinedCompound: universal.reduced,
     yearAnimal: chineseSign(fy),
     monthAnimal: chineseMonthSign(m, d),
-    dayAnimal: chineseDaySign(y, m, d),
     sun: sunSign(fm, fd),
     daySun: sunSign(m, d),
   });
-  const parts = [fit.numberPct, fit.month, fit.day, fit.sky].filter((n): n is number => n != null);
+  const parts = [fit.numberPct, fit.month, fit.sky].filter((n): n is number => n != null);
   if (!parts.length) return null;
   return {
     pct: Math.round(parts.reduce((s, n) => s + n, 0) / parts.length),
     number: fit.numberPct,
     month: fit.month,
-    dayAnimal: fit.day,
     sky: fit.sky,
     life: `${lp.compound}/${lp.reduced}`,
   };

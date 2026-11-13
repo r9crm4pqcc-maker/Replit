@@ -318,13 +318,8 @@ export interface VoteInput {
 export interface TeamRead { lp?: Num; foundedDay?: Num; sign?: Sign; name: Num; enemyYear: boolean; hits: string[] }
 export interface EntityProfile {
   side: Side | "venue"; role: string; name: string; date?: string;
-  lp?: Num; dayOfYear?: number; dayEnergy?: Num; yearSign?: Sign; monthSign?: Sign; daySign?: Sign;
+  lp?: Num; dayOfYear?: number; dayEnergy?: Num; yearSign?: Sign; monthSign?: Sign;
   pd?: Num; pdRel?: string; lucky?: number;
-}
-/** Chinese day animal (60-day cycle branch). */
-export function chineseDaySign(y: number, m: number, d: number): Sign {
-  const days = Math.floor(Date.UTC(y, m - 1, d) / 86400000) + 719163; // proleptic ordinal
-  return SIGNS[(((days + 2) % 12) + 12) % 12];
 }
 /** CUE Lucky Number: first digit of birth month + last non-zero digit of birth year, kept whole. */
 export function luckyNumber(year: number, month: number): number {
@@ -364,7 +359,7 @@ export interface VoteDecision {
   lunar: string;
 }
 export interface VoteResult {
-  entities: EntityProfile[]; gameDayOfYear: number; gameDaySign: Sign;
+  entities: EntityProfile[]; gameDayOfYear: number;
   votes: Vote[]; home: number; away: number; pick: Side; tiebreak: boolean;
   universalDay: Num; dayOfMonth: Num; yearSign: Sign; monthSign: Sign;
   noPlay: boolean; alerts: string[]; notes: string[]; missing: string[];
@@ -497,7 +492,7 @@ export function runVotes(inp: VoteInput): VoteResult {
     if (!b) { entities.push({ side, role, name }); return undefined; }
     const [y, m, d] = b; const pd = personalDayFor(b, inp.year, inp.month, inp.day);
     const e: EntityProfile = { side, role, name, date: `${m}/${d}/${y}`, lp: (founding ? foundingPath : lifePath)(y, m, d), dayOfYear: dayOfYear(y, m, d), dayEnergy: dayEnergy(d),
-      yearSign: chineseSign(y), monthSign: chineseMonthSign(m, d), daySign: chineseDaySign(y, m, d), lucky: luckyNumber(y, m), pd, pdRel: pdRelTo(pd) };
+      yearSign: chineseSign(y), monthSign: chineseMonthSign(m, d), lucky: luckyNumber(y, m), pd, pdRel: pdRelTo(pd) };
     entities.push(e); return e;
   };
   const pdVote = (s: Side, e: EntityProfile | undefined, w: number, layer: Step) => {
@@ -881,15 +876,15 @@ export function runVotes(inp: VoteInput): VoteResult {
   const specific = ruleTable as Record<string, { total?: number; weight?: number }>;
   const useRules = learningActive() && Object.keys(specific).length > 0;
   const adaptiveWeights = learningActive() ? layerWeights() : {};
+  const studyMultipliers: Partial<Record<Step, number>> = {};
   for (const v of votes) {
-    if (!useRules) {
-      const m = layerMultiplier(v.layer);
-      if (m !== 1) v.weight = Math.round(v.weight * m * 100) / 100;
-    } else {
+    if (useRules) {
       const row = specific[ruleId(v.reason)];
       if (row && (row.total ?? 0) >= 100) v.weight = Math.round(v.weight * (row.weight ?? 0) * 100) / 100;
     }
-    const learnedMultiplier = adaptiveWeights[v.layer] ?? 1;
+    // Use direct device learning when present; otherwise fall back to the
+    // current-code layer study. Never multiply the same feedback twice.
+    const learnedMultiplier = adaptiveWeights[v.layer] ?? (studyMultipliers[v.layer] ??= layerMultiplier(v.layer));
     if (learnedMultiplier !== 1) v.weight = Math.round(v.weight * learnedMultiplier * 100) / 100;
   }
   const ratingVote = votes.find(v => ruleId(v.reason) === "team-rating");
@@ -974,7 +969,7 @@ export function runVotes(inp: VoteInput): VoteResult {
     margin, threshold: 3, hard, cautions, volatility, bettor, powerColor, manifestation, eclipse,
     lunar: `Moon ${moon}, ${moonIllum}% lit. ${moonInfo.bias} — ${moonInfo.biasNote}`,
   };
-  return { entities, gameDayOfYear: dayOfYear(inp.year, inp.month, inp.day), gameDaySign: chineseDaySign(inp.year, inp.month, inp.day), votes, home, away, pick, tiebreak, universalDay: ud, dayOfMonth: dom, yearSign, monthSign, noPlay, alerts, notes, missing, reads, steps, confidence, band: confidenceBand(confidence), flags, decision };
+  return { entities, gameDayOfYear: dayOfYear(inp.year, inp.month, inp.day), votes, home, away, pick, tiebreak, universalDay: ud, dayOfMonth: dom, yearSign, monthSign, noPlay, alerts, notes, missing, reads, steps, confidence, band: confidenceBand(confidence), flags, decision };
 }
 
 /** Team colors (primary first). */

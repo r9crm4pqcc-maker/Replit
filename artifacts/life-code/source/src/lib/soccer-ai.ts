@@ -225,7 +225,7 @@ export interface SoccerBrief {
   yearFit: string;
   monthAnimal: string;
   monthFit: string;
-  dayAnimal: string;
+  weekdayPlanet: string;
   hours: { span: string; sign: string; fit: string }[];
   bestHours: string;
   lowHours: string;
@@ -357,7 +357,7 @@ export function soccerBrief(month: number, day: number, year: number): SoccerBri
     yearFit: `${yearAnimal} year is ${yFit} for the Ox.`,
     monthAnimal,
     monthFit: `${monthAnimal} month is ${mFit} for the Ox.`,
-    dayAnimal: `${dayNames[dow]} · ${planet}`,
+    weekdayPlanet: `${dayNames[dow]} · ${planet}`,
     hours,
     bestHours,
     lowHours,

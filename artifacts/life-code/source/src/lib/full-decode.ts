@@ -1,5 +1,5 @@
 // Full 5-part decode (Game Energies, Teams, Key Players, City, Stadium) + Healingood-style date matrix.
-import { reduceNum, lifePath, foundingPath, dayOfYear, luckyNumber, chineseSign, chineseMonthSign, chineseDaySign, SIGNS, numberRelation, type Num } from "./vote-decode";
+import { reduceNum, lifePath, foundingPath, dayOfYear, luckyNumber, chineseSign, chineseMonthSign, SIGNS, numberRelation, type Num } from "./vote-decode";
 import { calcPersonalYear } from "./numerology";
 import { compat } from "./gg33";
 import { fmtMD, healingood } from "./healingood";
@@ -40,7 +40,6 @@ export function monthPillar(y: number, m: number, d: number) {
   return `${STEMS[stem]} ${sign}`;
 }
 const dayStem = (y: number, m: number, d: number) => (ordinal(y, m, d) + 4) % 10;
-export const dayPillar = (y: number, m: number, d: number) => `${STEMS[dayStem(y, m, d)]} ${chineseDaySign(y, m, d)}`;
 export function hourPillar(y: number, m: number, d: number, hour: number) {
   const b = Math.floor((hour + 1) / 2) % 12;
   const stem = ((dayStem(y, m, d) % 5) * 2 + b) % 10;
@@ -94,7 +93,7 @@ export function dateScore(m: DateMatrix): number {
 
 export interface CycleRead {
   date: Tri; lp: Num; secondary: Num; doy: number; doyRoot: number; woy: number; woyRoot: number;
-  moon: ReturnType<typeof moon>; yearP: string; monthP: string; dayP: string;
+  moon: ReturnType<typeof moon>; yearP: string; monthP: string;
   py: Num; pm: Num; pd: Num; pw: Num; ph: [number, number, number]; lucky: number; luckyRoot: number; matrix: DateMatrix;
 }
 /** Every cycle for one dated entity (team, player, city, stadium) on the game day. */
@@ -107,18 +106,18 @@ export function readEntity(b: Tri, game: Tri, kickoffHour: number, founding = fa
   const hr = (h: number) => reduceNum(pd.reduced + digits(h % 24));
   const doy = dayOfYear(y, m, d); const woy = isoWeek(y, m, d); const lucky = luckyNumber(y, m);
   return { date: b, lp: (founding ? foundingPath : lifePath)(y, m, d), secondary: num(d), doy, doyRoot: reduceNum(doy), woy, woyRoot: reduceNum(woy), moon: moon(y, m, d),
-    yearP: yearPillar(y), monthP: monthPillar(y, m, d), dayP: dayPillar(y, m, d),
+    yearP: yearPillar(y), monthP: monthPillar(y, m, d),
     py: { compound: py.compound, reduced: py.reduced }, pm, pd, pw, ph: [hr(kickoffHour), hr(kickoffHour + 1), hr(kickoffHour + 3)],
     lucky, luckyRoot: reduceNum(lucky), matrix: dateMatrix(b, game) };
 }
 
-export interface GameEnergies { lp: Num; secondary: Num; doy: number; doyRoot: number; woy: number; woyRoot: number; moon: ReturnType<typeof moon>; yearP: string; monthP: string; dayP: string; hourP: string[] }
+export interface GameEnergies { lp: Num; secondary: Num; doy: number; doyRoot: number; woy: number; woyRoot: number; moon: ReturnType<typeof moon>; yearP: string; monthP: string; hourP: string[] }
 export function gameEnergies(game: Tri, kickoffHour: number): GameEnergies {
   const [y, m, d] = game;
   const uy = reduceNum(digits(y));
   const doy = dayOfYear(y, m, d); const woy = isoWeek(y, m, d);
   return { lp: num(m + d + uy), secondary: num(d), doy, doyRoot: reduceNum(doy), woy, woyRoot: reduceNum(woy), moon: moon(y, m, d),
-    yearP: yearPillar(y), monthP: monthPillar(y, m, d), dayP: dayPillar(y, m, d),
+    yearP: yearPillar(y), monthP: monthPillar(y, m, d),
     hourP: [hourPillar(y, m, d, kickoffHour), hourPillar(y, m, d, (kickoffHour + 2) % 24)] };
 }
 

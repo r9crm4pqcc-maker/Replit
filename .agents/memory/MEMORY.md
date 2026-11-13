@@ -1,0 +1,1 @@
+- [Sports decoding preferences](sports-decoding-preferences.md) — Preserve the user's number and cycle layers; remove only Chinese zodiac day animals and pillars.

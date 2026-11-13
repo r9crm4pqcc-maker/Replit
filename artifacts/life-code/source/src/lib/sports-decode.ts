@@ -127,19 +127,6 @@ export function chineseMonth(month: number, day: number): string {
   return current;
 }
 
-function julianDay(y: number, m: number, d: number): number {
-  const a = Math.floor((14 - m) / 12);
-  const yr = y + 4800 - a;
-  const mo = m + 12 * a - 3;
-  return d + Math.floor((153 * mo + 2) / 5) + 365 * yr + Math.floor(yr / 4)
-    - Math.floor(yr / 100) + Math.floor(yr / 400) - 32045;
-}
-export function chineseDay(year: number, month: number, day: number): string {
-  const jdn = julianDay(year, month, day);
-  const idx = ((jdn + 1) % 12 + 12) % 12;
-  return ANIMAL_YEAR[idx];
-}
-
 // Chinese hour: 12 two-hour periods starting 23:00 = Rat
 export function chineseHour(hour24: number): string {
   const shifted = (hour24 + 1) % 24; // 23→0 → Rat index 0
@@ -207,7 +194,6 @@ export function chinesePillarsAt(iso: string, tz: string) {
   return {
     year: chineseYear(p.y, p.m, p.d),
     month: chineseMonth(p.m, p.d),
-    day: chineseDay(p.y, p.m, p.d),
     hour: chineseHour(p.h),
     minute: chineseMinute(p.min),
     parts: p,
@@ -336,7 +322,6 @@ export interface PersonDecode {
   nameNumber: number;
   chineseYear?: string;
   chineseMonth?: string;
-  chineseDay?: string;
   westernSign?: string;
   sunSign?: string;
   moonSign?: string;
@@ -361,7 +346,6 @@ export function decodePerson(name: string, dob?: DateTuple | string | null): Per
     nameNumber: nn,
     chineseYear: chineseYear(y, m, d),
     chineseMonth: chineseMonth(m, d),
-    chineseDay: chineseDay(y, m, d),
     westernSign: sign,
     sunSign: sign,
     moonSign: moonSign(y, m, d),
@@ -389,7 +373,6 @@ export function decodeTeam(teamName: string): TeamDecode {
     nameNumber: nn,
     chineseYear: chineseYear(y, m, d),
     chineseMonth: chineseMonth(m, d),
-    chineseDay: chineseDay(y, m, d),
     westernSign: sign,
     sunSign: sign,
     moonSign: moonSign(y, m, d),
@@ -403,7 +386,6 @@ export interface CityDecode {
   lifePath?: number;
   chineseYear?: string;
   chineseMonth?: string;
-  chineseDay?: string;
   westernSign?: string;
 }
 export function decodeCity(name: string, founded?: DateTuple): CityDecode {
@@ -416,7 +398,6 @@ export function decodeCity(name: string, founded?: DateTuple): CityDecode {
     lifePath: lifePath(y, m, d).reduced,
     chineseYear: chineseYear(y, m, d),
     chineseMonth: chineseMonth(m, d),
-    chineseDay: chineseDay(y, m, d),
     westernSign: westernSign(m, d).sign,
   };
 }
@@ -438,7 +419,6 @@ export function decodeStadium(name: string, opened?: DateTuple): StadiumDecode {
     lifePath: lifePath(y, m, d).reduced,
     chineseYear: chineseYear(y, m, d),
     chineseMonth: chineseMonth(m, d),
-    chineseDay: chineseDay(y, m, d),
     westernSign: westernSign(m, d).sign,
   };
 }
@@ -453,7 +433,6 @@ export interface DailyDecode {
   universalDay: number;
   chineseYear: string;
   chineseMonth: string;
-  chineseDay: string;
   chineseHour?: string;
   chineseMinute?: string;
   westernSign: string;
@@ -483,7 +462,6 @@ export function decodeDate(
     universalDay: universalDay(year, month, day),
     chineseYear: chineseYear(year, month, day),
     chineseMonth: chineseMonth(month, day),
-    chineseDay: chineseDay(year, month, day),
     chineseHour: hour != null ? chineseHour(hour) : undefined,
     chineseMinute: minute != null ? chineseMinute(minute) : undefined,
     westernSign: westernSign(month, day).sign,

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useLife, rid, type FamilyPerson } from "./context";
 import { Card, Page, Tag } from "./kit";
-import { buildChart, fullName, pairRead, readDay, chineseDaySign } from "@/lib/life-studio";
+import { buildChart, fullName, pairRead, readDay } from "@/lib/life-studio";
 import { birthPair, dayCompatibility, fitFace, numberFit, FRIENDLY } from "@/lib/path28";
 import { readWord } from "@/lib/letterology";
 
@@ -168,13 +168,12 @@ function dateWindows(first: { year: number; month: number; day: number }, second
         combinedCompound: read.combined.compound,
         yearAnimal: chart.yearAnimal,
         monthAnimal: read.monthAnimal,
-        dayAnimal: chineseDaySign(y, m, d, null),
         sun: chart.sun,
         daySun: read.sun,
       });
       const dayNum = fit.numbers.find((n) => n.name === "Day");
-      const enemy = dayNum?.rel === "enemy" || fit.month <= 10 || fit.day <= 10 || fit.sky <= 10;
-      const parts = [layerScore(dayNum?.rel ?? "neutral", dayNum?.pct ?? null), fit.month, fit.day, fit.sky];
+      const enemy = dayNum?.rel === "enemy" || fit.month <= 10 || fit.sky <= 10;
+      const parts = [layerScore(dayNum?.rel ?? "neutral", dayNum?.pct ?? null), fit.month, fit.sky];
       return { read, enemy, pct: Math.round(parts.reduce((s, n) => s + n, 0) / parts.length) };
     });
     if (reads.some((r) => r.enemy)) continue;

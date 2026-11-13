@@ -8,7 +8,7 @@ describe("life studio", () => {
     expect(chart.yearAnimal).toBe("Ox");
     expect(chart.birthMonthAnimal).toBe("Rooster");
     expect(chart.birthPersonalMonth.reduced).toBe(9);
-    expect(chart.dayAnimal).toBe("Cat");
+    expect(chart).not.toHaveProperty("dayAnimal");
     expect(chart.hour).toBe("Snake");
     expect(chart.hours.filter((h) => h.enemy).map((h) => h.sign)).toEqual(["Pig"]);
     expect(chart.hours.find((h) => h.sign === "Cat")?.enemy).toBe(false);

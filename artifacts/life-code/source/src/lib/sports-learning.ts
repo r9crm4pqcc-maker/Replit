@@ -84,6 +84,21 @@ function readLog(): StepLogEntry[] {
   try { return JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); } catch { return []; }
 }
 function writeLog(l: StepLogEntry[]) { if (typeof window !== "undefined") localStorage.setItem(LOG_KEY, JSON.stringify(l)); }
+export function stepLogCount() { return readLog().length; }
+export function downloadStepLog() {
+  if (typeof window === "undefined") return;
+  const payload = {
+    learnedCode: LEARNED_CODE,
+    exportedAt: new Date().toISOString(),
+    entries: readLog(),
+  };
+  const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "sports-pick-log.json";
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 export function logStepPick(e: Omit<StepLogEntry, "actual">) {
   const l = readLog(); const ex = l.find(x => x.id === e.id);
   if (ex) { if (!ex.actual) { ex.pick = e.pick; ex.votes = e.votes; ex.confidence = e.confidence; ex.margin = e.margin; ex.noBet = e.noBet; } } else l.push(e);
@@ -240,7 +255,7 @@ export function setStudyCursor(y: number, m: number, d: number) {
   writeStudy(s);
 }
 
-/** Learned code drops a factor unless the saved study hit it above 54%. A coin flip does not vote. */
+/** Once a layer has enough current-code outcomes, weaken it below 54.5% accuracy. */
 export function layerMultiplier(layer: string): number {
   if (forceOriginal || sportsMode() !== "learned") return 1;
   const row = savedHistory().layers[layer];
@@ -257,7 +272,9 @@ export function layerMultiplier(layer: string): number {
       if ((side.home > side.away ? "home" : "away") === e.actual) hits++;
     }
   }
-  if (total < 30) return 0;
+  // Insufficient evidence should leave a factor at baseline, not erase its votes.
+  // Keeping it active also lets newly collected outcomes train the layer weight.
+  if (total < 30) return 1;
   const rate = hits / total;
   if (rate < 0.545) return 0;
   return Math.max(0.5, Math.min(3, Math.round(((rate - 0.5) / 0.09) * 100) / 100));

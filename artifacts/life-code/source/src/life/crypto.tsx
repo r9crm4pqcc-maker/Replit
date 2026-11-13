@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Card, Page, Tag } from "./kit";
 import { COINS, type Coin } from "@/lib/coins";
-import { buildChart, chineseDaySign, readDay } from "@/lib/life-studio";
+import { buildChart, readDay } from "@/lib/life-studio";
 import { cueDayBand, cueDayPercent, dayCompatibility } from "@/lib/path28";
 
 export default function CryptoPage() {
@@ -99,13 +99,12 @@ function coinRead(coin: Coin, cursor: { y: number; m: number; d: number }) {
     combinedCompound: read.combined.compound,
     yearAnimal: chart.yearAnimal,
     monthAnimal: read.monthAnimal,
-    dayAnimal: chineseDaySign(cursor.y, cursor.m, cursor.d, null),
     sun: chart.sun,
     daySun: read.sun,
   });
-  const layers = [fit.numberPct, fit.month, fit.day, fit.sky].filter((n): n is number => n != null);
+  const layers = [fit.numberPct, fit.month, fit.sky].filter((n): n is number => n != null);
   const dayLayer = fit.numbers.find((n) => n.name === "Day");
-  const note = `Life path ${fit.self} and the day ${dayLayer?.other ?? "—"} are ${dayLayer?.rel ?? "neutral"}. ${fit.numbers.filter((n) => n.name !== "Together").map((n) => `${n.name} ${n.pct != null ? `${n.pct}%` : n.rel}`).join(" · ")}. ${chart.yearAnimal} month ${fit.month}% · day ${fit.day}% · ${chart.sun} and ${read.sun} ${fit.sky}%.`;
+  const note = `Life path ${fit.self} and the day ${dayLayer?.other ?? "—"} are ${dayLayer?.rel ?? "neutral"}. ${fit.numbers.filter((n) => n.name !== "Together").map((n) => `${n.name} ${n.pct != null ? `${n.pct}%` : n.rel}`).join(" · ")}. ${chart.yearAnimal} with ${read.monthAnimal} month ${fit.month}% · ${chart.sun} with ${read.sun} ${fit.sky}%.`;
   return {
     coin,
     life: `${chart.lifePath.compound}/${chart.lifePath.reduced}`,
