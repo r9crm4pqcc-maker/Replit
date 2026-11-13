@@ -6,11 +6,11 @@
 
 import {
   reduceMaster, digitSum, nameNumber, lifePath as lifePathOf,
-  chineseYear, chineseMonth, chineseDay, chineseHour,
+  chineseYear, chineseMonth, chineseHour,
   moonPhase, moonSign, westernSign,
 } from "./sports-decode";
 import { cueDayBand, cueDayPercent, dayCompatibility, fitFace } from "@/lib/path28";
-import { chineseDaySign, chineseMonthSign, chineseSign, lifePath as chartLifePath } from "@/lib/vote-decode";
+import { chineseMonthSign, chineseSign, lifePath as chartLifePath } from "@/lib/vote-decode";
 import { sunSign } from "@/lib/life-studio";
 
 // ─── Entity database ─────────────────────────────────────────────────────────
@@ -259,7 +259,6 @@ export function calcMarketCode(
   const pillars = {
     year: chineseYear(year, month, day),
     month: chineseMonth(month, day),
-    day: chineseDay(year, month, day),
     hour: chineseHour(new Date(noonISO).getUTCHours()),
   };
   const entityElement = stemElement(ay);
@@ -338,16 +337,15 @@ export function calcMarketCode(
     combinedCompound: ud.reduced,
     yearAnimal: chineseSign(ay),
     monthAnimal: chineseMonthSign(month, day),
-    dayAnimal: chineseDaySign(year, month, day),
     sun: sunSign(am, ad),
     daySun: sunSign(month, day),
   });
   const dayLayer = fit.numbers.find((n) => n.name === "Day");
   const layer = (pct: number | null, rel?: string) => pct ?? (rel === "enemy" ? 10 : rel === "friend" ? 80 : 60);
-  const callPct = Math.round((layer(dayLayer?.pct ?? null, dayLayer?.rel) + fit.month + fit.day + fit.sky) / 4);
-  const weak = dayLayer?.rel === "enemy" || fit.month <= 10 || fit.day <= 10 || fit.sky <= 10;
+  const callPct = Math.round((layer(dayLayer?.pct ?? null, dayLayer?.rel) + fit.month + fit.sky) / 3);
+  const weak = dayLayer?.rel === "enemy" || fit.month <= 10 || fit.sky <= 10;
   const call: MarketCodeReading["call"] = weak || callPct <= 40 ? "DOWN" : callPct >= 63 ? "UP" : "FLAT";
-  const callNote = `${entity.symbol} ${face} vs day ${dayLayer?.other ?? "—"} ${dayLayer?.rel ?? "neutral"}. ${chineseSign(ay)} month ${fit.month}%, day ${fit.day}%, sun ${fit.sky}%.`;
+  const callNote = `${entity.symbol} ${face} vs day ${dayLayer?.other ?? "—"} ${dayLayer?.rel ?? "neutral"}. ${chineseSign(ay)} with ${chineseMonthSign(month, day)} month ${fit.month}%, sun ${fit.sky}%.`;
 
   // Vetoes
   const vetoes: string[] = [];
@@ -371,7 +369,7 @@ export function calcMarketCode(
     `Entity ${entity.symbol}: LP ${lp} · Name # ${nn} · ${entityElement} year${resonance?" · RESONANCE":""}\n` +
     `Lunar: ${mp.phase} → ${lunarDir} · moon ${ms} · sun ${ss}\n` +
     `Sector spotlight: ${spotlight}${sectorMatch?" · MATCH ✓":""}\n` +
-    `Chinese pillars: Y-${pillars.year} · M-${pillars.month} · D-${pillars.day} · H-${pillars.hour}\n` +
+    `Chinese pillars: Y-${pillars.year} · M-${pillars.month} · H-${pillars.hour}\n` +
     `Element: day ${dayElement} ${elementSupport} entity ${entityElement}\n` +
     `Mercury retro: ${mercuryRetro} · Eclipse: ${eclipseWindow}\n` +
     `Direction: ${candidateDirection} · ${entity.symbol} today ${callPct}% ${call} · Your day ${cuePercent}% (${cueBand}) · Score: ${score}/7 · Vetoes: ${vetoes.length?vetoes.join("; "):"none"} → ${action}`;

@@ -50,6 +50,17 @@ describe("vote decoder rules", () => {
     const r = runVotes({ year: 2026, month: 10, day: 16, home: { name: "H", people: [] }, away: { name: "A", people: [] } });
     expect(r.noPlay).toBe(true);
   });
+  it("keeps Chinese zodiac day-animal fields out of sports decode output", () => {
+    const r = runVotes({
+      year: 2026,
+      month: 10,
+      day: 8,
+      home: { name: "H", people: [] },
+      away: { name: "A", people: [] },
+    });
+    expect(r).not.toHaveProperty("gameDaySign");
+    expect(r.entities.some((entity) => "daySign" in entity)).toBe(false);
+  });
   it("example: Bucs over Cowboys on 10/8/2026 (1 & 8 day)", () => {
     const r = runVotes({ year: 2026, month: 10, day: 8, league: "NFL",
       home: { name: "Dallas Cowboys", founded: [1960, 1, 28], colors: ["Navy", "Silver"], people: [] },

@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { runVotes } from "./vote-decode";
 import {
   LEARNING_UPDATED_EVENT,
+  layerMultiplier,
   layerWeights,
   logStepPick,
   outcomeFromScore,
@@ -23,11 +24,17 @@ function installWindow() {
 
 describe("sports learning feedback", () => {
   beforeEach(() => {
-    vi.stubGlobal("window", installWindow());
+    const fakeWindow = installWindow();
+    vi.stubGlobal("window", fakeWindow);
+    vi.stubGlobal("localStorage", fakeWindow.localStorage);
   });
 
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it("keeps unproven layers at baseline so they can collect evidence", () => {
+    expect(layerMultiplier("Game-day energy")).toBe(1);
   });
 
   it("applies a learned layer weight to later predictions and notifies the page", () => {

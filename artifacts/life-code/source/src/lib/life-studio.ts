@@ -426,18 +426,6 @@ export function birthHour(profile) {
 		standard: daylight ? `${String(sh).padStart(2, "0")}:${String(sm).padStart(2, "0")}` : null,
 	};
 }
-export function chineseDaySign(y, m, d, standardHour) {
-	let yy = y, mm = m, dd = d;
-	if (standardHour != null && standardHour >= 23) {
-		const next = new Date(Date.UTC(y, m - 1, d + 1));
-		yy = next.getUTCFullYear(); mm = next.getUTCMonth() + 1; dd = next.getUTCDate();
-	}
-	const a = Math.floor((14 - mm) / 12);
-	const y2 = yy + 4800 - a;
-	const m2 = mm + 12 * a - 3;
-	const jdn = dd + Math.floor((153 * m2 + 2) / 5) + 365 * y2 + Math.floor(y2 / 4) - Math.floor(y2 / 100) + Math.floor(y2 / 400) - 32045;
-	return SIGNS[((jdn + 36) % 12 + 12) % 12];
-}
 export const animalLabel = (s) => (s === "Rabbit" ? "Cat" : s);
 const OPEN_MARKS = ["love", "soulmate", "wealth", "beneficial"];
 export function nameReading(profile) {
@@ -672,7 +660,6 @@ export function buildChart(profile, on) {
 	const birthMonthAnimal = chineseMonthSign(profile.month, profile.day);
 	const born = birthHour(profile);
 	const hour = born.sign;
-	const dayAnimal = chineseDaySign(profile.year, profile.month, profile.day, born.hour);
 	const birthPersonalMonth = calcPersonalMonth(py.reduced, profile.month);
 	const sun = sunSign(profile.month, profile.day);
 	const sid = (sunLongitude(profile.year, profile.month, profile.day) - 23.85 + 360) % 360;
@@ -738,7 +725,6 @@ export function buildChart(profile, on) {
 		cycleEnd: isoOf(end.getUTCFullYear(), end.getUTCMonth() + 1, end.getUTCDate()),
 		yearAnimal,
 		birthMonthAnimal,
-		dayAnimal,
 		hour,
 		hourStandard: born.standard,
 		hourDaylight: born.daylight,

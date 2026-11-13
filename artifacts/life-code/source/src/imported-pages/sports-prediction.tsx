@@ -4,7 +4,7 @@ import { ChevronDown, ChevronUp, RefreshCw, Loader2, AlertCircle, Calendar } fro
 import { fetchESPNGames, fetchFanDuelBoard, fetchOuts, getLeagueInfo, fetchFighterDob, type ESPNGame, type OddsBlock } from "@/lib/espn";
 import { getTeamMeta } from "@/lib/sports-data";
 import { fetchAutoMatchup, type AutoMatchup } from "@/lib/espn-auto";
-import { layerWeights, logStepPick, savedHistory, scoreStepPick, setSportsMode, sportsMode, stepHitRates, outcomeFromScore, LEARNING_UPDATED_EVENT, type SportsMode } from "@/lib/sports-learning";
+import { layerWeights, logStepPick, savedHistory, scoreStepPick, setSportsMode, sportsMode, stepHitRates, outcomeFromScore, LEARNING_UPDATED_EVENT, stepLogCount, downloadStepLog, type SportsMode } from "@/lib/sports-learning";
 import { calcAthletePersonalDay } from "@/lib/numerology";
 import { runVotes, TEAM_COLORS, fmt, colorNumsLabel, confidenceBand, type VoteResult } from "@/lib/vote-decode";
 import { FullDecode, computeFullDecode, parseDob, type DecodeEntity } from "@/components/FullDecode";
@@ -474,7 +474,7 @@ function GameCard({ game, year, month, day, idx, league, learned, learningRevisi
               <div className="overflow-x-auto mt-3 rounded-lg border border-border">
                 <table className="w-full text-[11px]">
                   <thead className="bg-muted/40 text-muted-foreground">
-                    <tr>{["Side", "Role", "Name", "Date", "Life Path", "Day #", "Day energy", "Lucky", "Year / Month / Day animal", "Personal Day"].map(h => <th key={h} className="text-left font-semibold px-2 py-1.5 whitespace-nowrap">{h}</th>)}</tr>
+                    <tr>{["Side", "Role", "Name", "Date", "Life Path", "Day #", "Day energy", "Lucky", "Year / Month animal", "Personal Day"].map(h => <th key={h} className="text-left font-semibold px-2 py-1.5 whitespace-nowrap">{h}</th>)}</tr>
                   </thead>
                   <tbody>
                     {v.entities.map((e, i) => (
@@ -488,7 +488,7 @@ function GameCard({ game, year, month, day, idx, league, learned, learningRevisi
                           <td className="px-2 py-1.5">{e.dayOfYear}</td>
                           <td className="px-2 py-1.5">{e.dayEnergy && fmt(e.dayEnergy)}</td>
                           <td className="px-2 py-1.5">{e.lucky}</td>
-                          <td className="px-2 py-1.5 whitespace-nowrap">{e.yearSign} / {e.monthSign} / {e.daySign}</td>
+                          <td className="px-2 py-1.5 whitespace-nowrap">{e.yearSign} / {e.monthSign}</td>
                           <td className="px-2 py-1.5 whitespace-nowrap">{e.pd && fmt(e.pd)} ({e.pdRel})</td>
                         </> : <td colSpan={7} className="px-2 py-1.5 text-muted-foreground">Birth / founding date not available yet</td>}
                       </tr>
@@ -531,16 +531,30 @@ function HitRatePanel() {
 
 function HistoryStudy() {
   const [snap, setSnap] = useState(() => savedHistory());
+  const [pickCount, setPickCount] = useState(() => stepLogCount());
   useEffect(() => {
-    const t = setInterval(() => setSnap(savedHistory()), 4000);
+    const t = setInterval(() => {
+      setSnap(savedHistory());
+      setPickCount(stepLogCount());
+    }, 4000);
     return () => clearInterval(t);
   }, []);
   return (
-    <p className="text-[11px] text-white/50">
-      {snap.current
-        ? `Learned code · ${snap.games.toLocaleString()} games · ${snap.pct}% · through ${snap.through?.[1]}/${snap.through?.[0]}. Same code on every finished game and every game still ahead.`
-        : "Saved study is an older code. It is not mixed in. The current learned code scores finished games and games still ahead."}
-    </p>
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <p className="text-[11px] text-white/50">
+        {snap.current
+          ? `Learned code · ${snap.games.toLocaleString()} games · ${snap.pct}% · through ${snap.through?.[1]}/${snap.through?.[0]}. Same code on every finished game and every game still ahead.`
+          : "Saved study is an older code. It is not mixed in. The current learned code scores finished games and games still ahead."}
+      </p>
+      <button
+        type="button"
+        onClick={downloadStepLog}
+        disabled={pickCount === 0}
+        className="rounded-md border border-white/10 px-2.5 py-1 text-[10px] font-semibold text-white/70 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Export pick log ({pickCount})
+      </button>
+    </div>
   );
 }
 

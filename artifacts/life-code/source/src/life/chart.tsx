@@ -68,10 +68,9 @@ export default function ChartPage() {
 
       <Card>
         <div id="chinese"><CardTitle>Chinese animal</CardTitle></div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <Stat label="Year" value={animalLabel(chart.yearAnimal)} hint={profile.year === 2009 && chart.yearAnimal === "Ox" ? OX_YEAR.line : "The year animal."} />
           <Stat label="Month" value={animalLabel(chart.birthMonthAnimal)} hint={`Personal month ${chart.birthPersonalMonth.reduced}. The 9 is the personal month. The animal is separate.`} />
-          <Stat label="Day" value={animalLabel(chart.dayAnimal)} hint="The day animal of the birth date." />
           <Stat label="Hour" value={chart.hour ? animalLabel(chart.hour) : "Add a time"} hint={chart.hourDaylight ? `Clock ${profile.time} is daylight time. Standard time is ${chart.hourStandard}, and that is the hour.` : "Two-hour pillar from standard time."} />
         </div>
         {chart.yearAnimal === "Ox" && <OxReading />}

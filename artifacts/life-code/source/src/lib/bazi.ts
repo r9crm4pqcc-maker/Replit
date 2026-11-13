@@ -14,7 +14,6 @@ export interface BaZiPillar {
 export interface BaZiChart {
   year: BaZiPillar;
   month: BaZiPillar;
-  day: BaZiPillar;
   hour: BaZiPillar;
   dayMaster: string;
   dayMasterElement: string;
@@ -89,13 +88,11 @@ function makePillar(stemName: string, branchName: string): BaZiPillar {
 // Cristian Zavala — Sep 8, 2009, 11:18 AM Chicago
 // Year Pillar: 2009 = Ji Chou (Earth Ox)
 // Month Pillar: Sep 2009 = Xin You (Metal Rooster — month 8 Rooster month, stem Xin from Ji year cycle)
-// Day Pillar: Sep 8, 2009 = Gui Mao (Water Rabbit) — per standard BaZi day pillar table
-// Hour Pillar: 11:18 AM = Wu hour (11am–1pm), on Gui day: Wu stem for Wu branch → Geng Wu (Metal Horse)
+// Hour Pillar: 11:18 AM = Wu hour (11am–1pm), using the Gui day stem → Geng Wu (Metal Horse)
 
 const CHART: BaZiChart = {
   year:  makePillar("Ji", "Chou"),
   month: makePillar("Xin", "You"),
-  day:   makePillar("Gui", "Mao"),
   hour:  makePillar("Geng", "Wu"),
 
   dayMaster: "Gui",
@@ -107,7 +104,7 @@ const CHART: BaZiChart = {
 
   // Gui (Yin Water) Day Master analysis:
   // Chart has: Ji (Earth), Xin (Metal), Gui (Water), Geng (Metal)
-  // Branches: Chou (Earth), You (Metal), Mao (Wood), Wu (Fire)
+  // Year, month, and hour branches: Chou (Earth), You (Metal), Wu (Fire)
   // Metal generates Water → Water is supported
   // Wood from Mao drains Water → neutral
   // Fire from Wu controls Metal somewhat
@@ -128,11 +125,11 @@ const CHART: BaZiChart = {
     { age: "41–50", yearRange: "2050–2059", stem: "Wu",  branch: "Chen", element: "Earth",       theme: "Stabilization — Earth structures career and legacy. Management roles.", sports: "Authority and ownership roles in sports organizations." },
   ],
 
-  interpretation: "Gui Yin Water Day Master — You are the 'rain' archetype: nourishing, adaptable, deeply intuitive, and capable of permeating any obstacle like water through rock. Metal (your Year and Hour pillars) generates and supports you. Your chart has strong Water+Metal combination which in Chinese astrology represents intelligence, precision, strategic thinking, and emotional depth. The Ox (year animal) gives you extraordinary endurance and discipline. The Rooster month gives precision and critical eye. The Cat (Mao) day branch makes you socially graceful with artistic sensitivity. Your chart is built for methodical excellence — not flash, but unstoppable consistency.",
+  interpretation: "Gui Yin Water Day Master — You are the 'rain' archetype: nourishing, adaptable, deeply intuitive, and capable of permeating any obstacle like water through rock. Metal (your Year and Hour pillars) generates and supports you. Your chart has strong Water+Metal combination which in Chinese astrology represents intelligence, precision, strategic thinking, and emotional depth. The Ox (year animal) gives you extraordinary endurance and discipline. The Rooster month gives precision and critical eye. Your chart is built for methodical excellence — not flash, but unstoppable consistency.",
 
   athleticTiming: "Your current Luck Pillar (Xin Wei, ages 11–20, 2020–2029) is Metal+Earth. Metal feeds your Gui Water Day Master — this is a supportive period for skill development and rising recognition. The window of 2026–2028 is activated by your Personal Year 9→1 transition (9-year cycle) AND your Luck Pillar favorability — this is your breakout period. Commit to maximum performance training during this window.",
 
-  sportOverlay: "Soccer/Winger position: Water element in sports manifests as fluid movement, adaptability, reading the game (intuition), and finding space. The Cat (Mao) in your Day branch is quick and light — naturally suited for speed on the wing. Ox year gives iron stamina. Rooster month gives precision passing and positioning.",
+  sportOverlay: "Soccer/Winger position: Water element in sports manifests as fluid movement, adaptability, reading the game (intuition), and finding space. Ox year gives iron stamina. Rooster month gives precision passing and positioning.",
 };
 
 export const BAZI = CHART;
@@ -142,7 +139,7 @@ export const ZODIAC_COMPAT: Record<string, { score: number; note: string }> = {
   Rat:    { score: 85, note: "Excellent — Rat and Ox form a natural union. High synergy." },
   Ox:     { score: 70, note: "Good — Ox self-combination. Natural but can be slow." },
   Tiger:  { score: 60, note: "Moderate — Tiger-Ox conflict. Competition energy." },
-  Cat:    { score: 90, note: "Excellent — Cat is your day branch. Natural flow." },
+  Cat:    { score: 90, note: "Excellent — Cat energy supports natural flow." },
   Dragon: { score: 75, note: "Good — Dragon and Ox share Earth element." },
   Snake:  { score: 80, note: "Very good — Snake and Ox form a Metal semi-combination." },
   Horse:  { score: 50, note: "Challenging — Horse and Ox are in clash. Heightened pressure." },

@@ -5,7 +5,7 @@
 
 import {
   lifePath, secondaryEnergy, nameNumber, dayNumberLabel,
-  chineseYear, chineseMonth, chineseDay,
+  chineseYear, chineseMonth,
   westernSign, moonSign, moonPhase, reduceMaster,
   universalYear, COMPAT, compatTier, compatStrength,
   chinesePillarsAt, cityTz,
@@ -85,7 +85,6 @@ export interface TeamPanel {
   nameNumber?: { value: number; expr: string };
   czYearLabel?: string;
   czMonth?: string;
-  czDay?: string;
   westernZodiac?: string;
   sunSign?: string;
   moonSign?: string;
@@ -107,7 +106,6 @@ export interface StadiumPanel {
   nameNumber?: { value: number; expr: string };
   czYearLabel?: string;
   czMonth?: string;
-  czDay?: string;
   westernZodiac?: string;
 }
 
@@ -131,7 +129,6 @@ export interface MatchupContext {
   lunarNote: string;
   yearZodiac: string;
   monthZodiac: string;
-  dayZodiac: string;
   hourZodiac?: string;
   minuteZodiac?: string;
   venueTz?: string;
@@ -149,9 +146,8 @@ export interface Verdict {
 export interface WeightedBreakdown {
   day: number;      // 0-100
   color: number;    // 0-100
-  zodiac: number;   // 0-100
   opponent: number; // 0-100
-  total: number;    // 0-10 (weighted 40/20/20/20)
+  total: number;    // 0-10 (40/20/20 plus a neutral 20% baseline)
   bias: number;     // learning bias applied (-1..1)
 }
 
@@ -220,7 +216,6 @@ function buildTeam(name: string, meta?: TeamMeta): TeamPanel {
     nameNumber: nameNumOf(name),
     czYearLabel: czYearFull(y, m, d),
     czMonth: chineseMonth(m, d),
-    czDay: chineseDay(y, m, d),
     westernZodiac: westernSign(m, d).sign,
     sunSign: westernSign(m, d).sign,
     moonSign: moonSign(y, m, d),
@@ -250,7 +245,6 @@ function buildStadium(meta?: TeamMeta): StadiumPanel | null {
     nameNumber: nameNumOf(meta.stadium),
     czYearLabel: czYearFull(y, m, d),
     czMonth: chineseMonth(m, d),
-    czDay: chineseDay(y, m, d),
     westernZodiac: westernSign(m, d).sign,
   };
 }
@@ -324,7 +318,6 @@ export function analyzeMatchup(input: MatchupInput): MatchupAnalysis {
     lunarNote: mp.biasNote,
     yearZodiac: pillars.year,
     monthZodiac: pillars.month,
-    dayZodiac: pillars.day,
     hourZodiac: pillars.hour,
     minuteZodiac: pillars.minute,
     venueTz: tz,
@@ -335,8 +328,6 @@ export function analyzeMatchup(input: MatchupInput): MatchupAnalysis {
   const insights: InsightCard[] = [];
   let homeScore = 0;
   let awayScore = 0;
-
-  const dayCZ = ctx.dayZodiac;
 
   // Helper to build COMPAT body text
   function compatBody(lp: number, dayN: number, tier: Tier): string {
@@ -370,59 +361,6 @@ export function analyzeMatchup(input: MatchupInput): MatchupAnalysis {
     awayScore += tierScore(t.tier);
   }
 
-  // 3) CZ: HOME year vs DAY zodiac
-  if (home.founded) {
-    const homeCZ = chineseYear(home.founded.y, home.founded.m, home.founded.d);
-    const rel = czRelation(homeCZ, dayCZ);
-    let title = "NEUTRAL", tier: Tier = "NEUTRAL", body = "";
-    if (rel.type === "same") {
-      title = "SECRET FRIEND MATCH"; tier = "FRIENDLY";
-      body = `${homeTeam} born in ${homeCZ} year. Day of the ${dayCZ}. Same energy — enormous home resonance.`;
-      homeScore += 1.5;
-    } else if (rel.type === "trine") {
-      title = `${rel.name.toUpperCase()} ALIGNED`; tier = "FRIENDLY";
-      body = `${homeTeam}'s founding ${homeCZ} and day ${dayCZ} are both in the ${rel.name} (${rel.element}). Strong zodiac boost.`;
-      homeScore += 1;
-    } else if (rel.type === "secret-friend") {
-      title = "SECRET FRIENDS ✓"; tier = "FRIENDLY";
-      body = `${homeCZ} ↔ ${dayCZ} = Liu He secret friend pair. Hidden support for the host.`;
-      homeScore += 1;
-    } else if (rel.type === "clash") {
-      title = "ENEMY ✗"; tier = "ENEMY";
-      body = `${homeCZ} ↔ ${dayCZ}: direct clash (Liu Chong). ${homeTeam}'s founding sign opposes the day.`;
-      homeScore -= 1;
-    } else {
-      body = `${homeCZ} and ${dayCZ}: not directly aligned, not enemies. Neutral.`;
-    }
-    insights.push({ badge: `CZ: ${homeTeam.toUpperCase()} (${homeCZ}) × DAY (${dayCZ})`, title, tier, body });
-  }
-  // 4) CZ: AWAY year vs DAY zodiac
-  if (away.founded) {
-    const awayCZ = chineseYear(away.founded.y, away.founded.m, away.founded.d);
-    const rel = czRelation(awayCZ, dayCZ);
-    let title = "NEUTRAL", tier: Tier = "NEUTRAL", body = "";
-    if (rel.type === "same") {
-      title = "SAME SIGN ✓"; tier = "FRIENDLY";
-      body = `${awayTeam} born in ${awayCZ} year. Day is also ${awayCZ}. Same sign — neutral, not boosted.`;
-      awayScore += 0.5;
-    } else if (rel.type === "trine") {
-      title = `${rel.name.toUpperCase()} ✓`; tier = "FRIENDLY";
-      body = `${awayTeam}'s ${awayCZ} is in the ${rel.name} with day ${dayCZ}. Major boost for ${awayTeam}.`;
-      awayScore += 1;
-    } else if (rel.type === "secret-friend") {
-      title = "SECRET FRIENDS ✓"; tier = "FRIENDLY";
-      body = `${awayCZ} ↔ ${dayCZ} = Liu He secret friend pair. ${awayTeam} gets hidden support.`;
-      awayScore += 1;
-    } else if (rel.type === "clash") {
-      title = "ENEMY ✗"; tier = "ENEMY";
-      body = `${awayCZ} ↔ ${dayCZ}: direct enemies. ${awayTeam}'s founding clashes with the day.`;
-      awayScore -= 1;
-    } else {
-      body = `${awayCZ} and ${dayCZ}: not enemies, not friends. Neutral.`;
-    }
-    insights.push({ badge: `CZ: ${awayTeam.toUpperCase()} (${awayCZ}) × DAY (${dayCZ})`, title, tier, body });
-  }
-
   // 5) Stadium LP × City LP — master resonance
   if (stadium?.lifepath && city?.lifepath) {
     const sLP = stadium.lifepath.value;
@@ -443,37 +381,6 @@ export function analyzeMatchup(input: MatchupInput): MatchupAnalysis {
         body: `Stadium and city both reduce to ${sLP}. Coherent home energy.`,
       });
       homeScore += 0.5;
-    }
-  }
-
-  // 6) Stadium CZ × DAY CZ — secret friend / trine
-  if (stadium?.czYearLabel) {
-    const sCZ = stadium.czYearLabel.split(" ").pop() ?? "";
-    const rel = czRelation(sCZ, dayCZ);
-    if (rel.type === "secret-friend") {
-      insights.push({
-        badge: `STADIUM CZ (${sCZ}) × DAY (${dayCZ})`,
-        title: `${sCZ.toUpperCase()} ↔ ${dayCZ.toUpperCase()} SECRET FRIENDS`,
-        tier: "FRIENDLY",
-        body: `Stadium born in ${sCZ} year. ${sCZ} & ${dayCZ} = SECRET FRIENDS. Stadium vibrates with the day — home venue boost.`,
-      });
-      homeScore += 1;
-    } else if (rel.type === "trine") {
-      insights.push({
-        badge: `STADIUM CZ (${sCZ}) × DAY (${dayCZ})`,
-        title: `${rel.name.toUpperCase()} ✓`,
-        tier: "FRIENDLY",
-        body: `Stadium ${sCZ} and day ${dayCZ} both in ${rel.name}. Venue resonates with the day.`,
-      });
-      homeScore += 0.5;
-    } else if (rel.type === "clash") {
-      insights.push({
-        badge: `STADIUM CZ (${sCZ}) × DAY (${dayCZ})`,
-        title: "ENEMY ✗",
-        tier: "ENEMY",
-        body: `Stadium (${sCZ}) and day (${dayCZ}) clash. Venue fights its own host energy.`,
-      });
-      homeScore -= 1;
     }
   }
 
@@ -544,14 +451,14 @@ export function analyzeMatchup(input: MatchupInput): MatchupAnalysis {
       side: "home",
       label: `${homeTeam.toUpperCase()} WIN`,
       color: "GREEN",
-      oneLiner: `Day ${dayLP} + Zodiac stack favors ${homeTeam} on home turf.`,
+      oneLiner: `Day ${dayLP} + remaining layers favor ${homeTeam} on home turf.`,
     };
   } else {
     verdict = {
       side: "away",
       label: `${awayTeam.toUpperCase()} WIN`,
       color: "GREEN",
-      oneLiner: `Day ${dayLP} + Zodiac stack favors ${awayTeam} despite the venue.`,
+      oneLiner: `Day ${dayLP} + remaining layers favor ${awayTeam} despite the venue.`,
     };
   }
 
@@ -565,9 +472,6 @@ export function analyzeMatchup(input: MatchupInput): MatchupAnalysis {
     home.teamLifepath && away.teamLifepath
       ? `Day ${dayLP} ${compatTier(dayLP, home.teamLifepath.value)} to ${homeTeam} (LP ${home.teamLifepath.value}) and ${compatTier(dayLP, away.teamLifepath.value)} to ${awayTeam} (LP ${away.teamLifepath.value}). `
       : "",
-    home.founded
-      ? `${homeTeam}'s founding Chinese Zodiac (${chineseYear(home.founded.y, home.founded.m, home.founded.d)}) vs day (${dayCZ}) = ${czRelation(chineseYear(home.founded.y, home.founded.m, home.founded.d), dayCZ).type}. `
-      : "",
     `The ${mp.phase} (${mp.bias.toLowerCase()}) ${mp.bias === "FAVORITES" ? "backs the chalk" : "pushes underdogs"}. `,
     stadium?.lifepath && city?.lifepath
       ? `Stadium LP ${stadium.lifepath.value} × City LP ${city.lifepath.value} sets the venue tone. `
@@ -577,7 +481,7 @@ export function analyzeMatchup(input: MatchupInput): MatchupAnalysis {
       : `Read: ${verdict.label}.`,
   ].join("");
 
-  // ─── Weighted 0-10 Scoring (Day 40 / Color 20 / Zodiac 20 / Opponent 20) ─
+  // ─── Weighted scoring; the removed day-animal slice remains neutral ──────
   const homeColor = dominantColor(input.homeColors);
   const awayColor = dominantColor(input.awayColors);
 
@@ -601,18 +505,7 @@ export function analyzeMatchup(input: MatchupInput): MatchupAnalysis {
     if (awayColor?.enemy) colorA = Math.min(colorA, 25);
   }
 
-  // 3) Zodiac (0-100) — CZ year vs day zodiac
-  function czScore(rel: ReturnType<typeof czRelation>): number {
-    if (rel.type === "same" || rel.type === "trine" || rel.type === "secret-friend") return 85;
-    if (rel.type === "clash") return 20;
-    return 50;
-  }
-  const homeCZ = home.founded ? chineseYear(home.founded.y, home.founded.m, home.founded.d) : "";
-  const awayCZ = away.founded ? chineseYear(away.founded.y, away.founded.m, away.founded.d) : "";
-  const zodH = homeCZ ? czScore(czRelation(homeCZ, dayCZ)) : 50;
-  const zodA = awayCZ ? czScore(czRelation(awayCZ, dayCZ)) : 50;
-
-  // 4) Opponent H2H (0-100) — LP tier between the two teams
+  // 3) Opponent H2H (0-100) — LP tier between the two teams
   const oppH = compatStrength(homeLP, awayLP);
   const oppA = compatStrength(awayLP, homeLP);
 
@@ -620,19 +513,19 @@ export function analyzeMatchup(input: MatchupInput): MatchupAnalysis {
   const biasH = getBias(homeTeam);
   const biasA = getBias(awayTeam);
 
-  function tenOf(day: number, color: number, zod: number, opp: number, bias: number) {
-    // Numerology (day) dominates: 40/20/20/20 weighting.
-    const pct = day * 0.40 + color * 0.20 + zod * 0.20 + opp * 0.20;
+  function tenOf(day: number, color: number, opp: number, bias: number) {
+    // Preserve the old scale; the removed day-animal share contributes no edge.
+    const pct = day * 0.40 + color * 0.20 + opp * 0.20 + 10;
     return Math.max(0, Math.min(10, pct / 10 + bias * 0.5));
   }
 
   const weightedHome: WeightedBreakdown = {
-    day: dayH, color: colorH, zodiac: zodH, opponent: oppH,
-    total: tenOf(dayH, colorH, zodH, oppH, biasH), bias: biasH,
+    day: dayH, color: colorH, opponent: oppH,
+    total: tenOf(dayH, colorH, oppH, biasH), bias: biasH,
   };
   const weightedAway: WeightedBreakdown = {
-    day: dayA, color: colorA, zodiac: zodA, opponent: oppA,
-    total: tenOf(dayA, colorA, zodA, oppA, biasA), bias: biasA,
+    day: dayA, color: colorA, opponent: oppA,
+    total: tenOf(dayA, colorA, oppA, biasA), bias: biasA,
   };
   const confidencePct = Math.round(
     100 * Math.abs(weightedHome.total - weightedAway.total) /

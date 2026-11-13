@@ -2,7 +2,7 @@ import { Link } from "@/lib/wouter";
 import { useParams } from "@/lib/wouter";
 import { useLife } from "./context";
 import { Card, Page, Stat, Tag } from "./kit";
-import { LIST_LABEL, parseIso, readDay, seasonOf, buildChart, chineseDaySign, type BirthProfile } from "@/lib/life-studio";
+import { LIST_LABEL, parseIso, readDay, seasonOf, buildChart, type BirthProfile } from "@/lib/life-studio";
 import { DAY_28_ON_7, cueDayBand, cueDayPercent, dayCompatibility, isPath28 } from "@/lib/path28";
 
 export function DayFit({ profile, y, m, d }: { profile: BirthProfile; y: number; m: number; d: number }) {
@@ -19,7 +19,6 @@ export function DayFit({ profile, y, m, d }: { profile: BirthProfile; y: number;
     combinedCompound: read.combined.compound,
     yearAnimal: chart.yearAnimal,
     monthAnimal: read.monthAnimal,
-    dayAnimal: chineseDaySign(y, m, d, null),
     sun: chart.sun,
     daySun: read.sun,
   });
@@ -41,7 +40,6 @@ export function DayFit({ profile, y, m, d }: { profile: BirthProfile; y: number;
       combinedCompound: r.combined.compound,
       yearAnimal: c.yearAnimal,
       monthAnimal: r.monthAnimal,
-      dayAnimal: chineseDaySign(ny, nm, nd, null),
       sun: c.sun,
       daySun: r.sun,
     });
@@ -58,7 +56,7 @@ export function DayFit({ profile, y, m, d }: { profile: BirthProfile; y: number;
         {fit.numberPct != null ? ` · number fit ${fit.numberPct}%` : ""}
       </p>
       <p className="text-sm text-muted-foreground mt-1">
-        {chart.yearAnimal} month {read.monthAnimal} {fit.month}% · {chart.yearAnimal} day {chineseDaySign(y, m, d, null)} {fit.day}% · {chart.sun} and {read.sun} {fit.sky}%
+        Chinese zodiac: {chart.yearAnimal} with {read.monthAnimal} month {fit.month}% · Western sun: {chart.sun} with {read.sun} {fit.sky}%
       </p>
       <p className="text-xs text-muted-foreground mt-3">Next days, life path against the calendar day</p>
       <p className="text-sm text-foreground">{week.map((w) => `${w.nd} ${w.pct != null ? `${w.pct}%` : "—"}`).join(" · ")}</p>

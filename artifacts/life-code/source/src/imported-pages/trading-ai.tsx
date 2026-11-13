@@ -187,10 +187,9 @@ export default function TradingAIPage() {
             </div>
 
             {/* Chinese pillars */}
-            <div className="grid grid-cols-4 gap-2 mb-3">
+            <div className="grid grid-cols-3 gap-2 mb-3">
               <Chip label="CZ Year"  value={<>{ZODIAC_ICON[day.chinesePillars.year] ?? "🌀"} {day.chinesePillars.year}</>} />
               <Chip label="CZ Month" value={<>{ZODIAC_ICON[day.chinesePillars.month] ?? "🌀"} {day.chinesePillars.month}</>} />
-              <Chip label="CZ Day"   value={<>{ZODIAC_ICON[day.chinesePillars.day] ?? "🌀"} {day.chinesePillars.day}</>} />
               <Chip label="CZ Hour"  value={<>{ZODIAC_ICON[day.chinesePillars.hour] ?? "🌀"} {day.chinesePillars.hour}</>} />
             </div>
 
